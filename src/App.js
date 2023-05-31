@@ -1,23 +1,43 @@
 import logo from './logo.svg';
 import './App.css';
+import React, { useState } from 'react';
+import { RecordWebcam, useRecordWebcam } from 'react-record-webcam';
 
 function App() {
+  const [recording, setRecording] = useState(false);
+  const [recordedChunks, setRecordedChunks] = useState([]);
+
+  const onStopRecording = (recordedBlob) => {
+    setRecordedChunks([recordedBlob]);
+  };
+
+  const {
+    handleStartRecording,
+    handleStopRecording,
+    mediaBlobUrl,
+    previewStream,
+  } = useRecordWebcam({ onStopRecording });
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>React Record Webcam Example</h1>
+      <RecordWebcam
+        className="video-container"
+        previewStream={previewStream}
+      />
+      <div>
+        <button onClick={handleStartRecording} disabled={recording}>
+          Start Recording
+        </button>
+        <button onClick={handleStopRecording} disabled={!recording}>
+          Stop Recording
+        </button>
+      </div>
+      {recordedChunks.length > 0 && (
+        <video controls>
+          <source src={mediaBlobUrl} type="video/webm" />
+        </video>
+      )}
     </div>
   );
 }
